@@ -65,7 +65,7 @@ port (
 	clk_1024xfs_from_pll_i						: in std_logic;
 	pll_lock_n_i								: in std_logic;
 	clk_to_pll_o								: out std_logic;
-	pll_mult_value_o							: out integer;
+	pll_mult_value_o							: out std_logic_vector(31 downto 0);
 		
 	--tdm/i2s clk interface
 	mclk_o										: out std_logic;
@@ -212,10 +212,10 @@ begin
 								'0';
 					
 
-	pll_mult_value_o 	<= 		mult_clk_x16		when (sys_mode_i="00" or (sys_mode_i="10" and tdm8_i2s_mode_i='1')) else
-								mult_clk625_44k1_i 	when (sys_mode_i="01" and fs_mode_i="00") else
-								mult_clk625_48k_i		when (sys_mode_i="01" and fs_mode_i="01") else
-								mult_clk_x4;		--sys_mode=10 and tdm8-mode
+	pll_mult_value_o 	<= 		std_logic_vector(to_unsigned(mult_clk_x16, 32))		when (sys_mode_i="00" or (sys_mode_i="10" and tdm8_i2s_mode_i='1')) else
+								std_logic_vector(to_unsigned(mult_clk625_44k1_i, 32)) 	when (sys_mode_i="01" and fs_mode_i="00") else
+								std_logic_vector(to_unsigned(mult_clk625_48k_i, 32))		when (sys_mode_i="01" and fs_mode_i="01") else
+								std_logic_vector(to_unsigned(mult_clk_x4, 32));		--sys_mode=10 and tdm8-mode
 
 
 
