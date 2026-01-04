@@ -77,7 +77,7 @@ port (
 		clk_1024xfs_from_pll_i				: in  std_logic; 
 		pll_lock_n_i						: in  std_logic; 
 		clk_to_pll_o						: out std_logic;
-		pll_mult_value_o					: out integer;
+		pll_mult_value_o					: out std_logic_vector(31 downto 0);
 		pll_init_busy_i						: in  std_logic; 
 		
 		--tdm/i2s clk interface
@@ -104,17 +104,17 @@ port (
 		
 		
 		--variables
-		debug_out_signal_pulse_len_i		: in integer range 1000000 downto 0;		-- 1000000@100MHz
-		first_transmit_start_counter_48k_i	: in integer range 5000000 downto 0;		-- 4249500@100MHz
-		first_transmit_start_counter_44k1_i	: in integer range 5000000 downto 0;		-- 4610800@100MHz	
+		debug_out_signal_pulse_len_i			: in std_logic_vector(19 downto 0);		-- 1000000@100MHz
+		first_transmit_start_counter_48k_i	: in std_logic_vector(22 downto 0);		-- 4249500@100MHz
+		first_transmit_start_counter_44k1_i	: in std_logic_vector(22 downto 0);		-- 4610800@100MHz	
 		
-		wd_aes_clk_timeout_i				: in integer range 50 downto 0; 			-- 50@100MHz
-		wd_aes_rx_dv_timeout_i			    : in integer range 20000 downto 0;			-- 15000@100MHz	
-		mdix_timer_1ms_reference_i			: in integer range 100000 downto 0;			-- 100000@100MHz
-		aes_clk_ok_counter_reference_i		: in integer range 1000000 downto 0;		-- 1000000@100MHz
+		wd_aes_clk_timeout_i						: in std_logic_vector(5 downto 0); 		-- 50@100MHz
+		wd_aes_rx_dv_timeout_i			   	: in std_logic_vector(14 downto 0);		-- 15000@100MHz	
+		mdix_timer_1ms_reference_i				: in std_logic_vector(16 downto 0);		-- 100000@100MHz
+		aes_clk_ok_counter_reference_i		: in std_logic_vector(19 downto 0);		-- 1000000@100MHz
 		--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
-		mult_clk625_48k_i					: in integer;								-- 8246337@100MHz
-		mult_clk625_44k1_i					: in integer								-- 7576322@100MHz
+		mult_clk625_48k_i							: in std_logic_vector(31 downto 0);		-- 8246337@100MHz
+		mult_clk625_44k1_i						: in std_logic_vector(31 downto 0)		-- 7576322@100MHz
 		);
 end aes50_top;
 
@@ -324,7 +324,7 @@ begin
 				--debug pulse generator for assm from clk
 				if (assm_active_edge = "01") then
 					assm_debug_out <= '1';
-					assm_debug_out_signal_counter <= debug_out_signal_pulse_len_i;
+					assm_debug_out_signal_counter <= to_integer(signed(debug_out_signal_pulse_len_i));
 				else
 					if (assm_debug_out_signal_counter > 0) then
 						assm_debug_out_signal_counter <= assm_debug_out_signal_counter - 1;
@@ -340,7 +340,7 @@ begin
 				--debug pulse generator for assm (tx-module)
 				if (assm_tx_is_active_edge = "01") then
 					assm_tx_is_active_debug_out <= '1';
-					assm_tx_is_active_debug_out_signal_counter <= debug_out_signal_pulse_len_i;
+					assm_tx_is_active_debug_out_signal_counter <= to_integer(signed(debug_out_signal_pulse_len_i));
 				else
 					if (assm_tx_is_active_debug_out_signal_counter > 0) then
 						assm_tx_is_active_debug_out_signal_counter <= assm_tx_is_active_debug_out_signal_counter - 1;
@@ -352,7 +352,7 @@ begin
 				--debug pulse generator for assm (rx-module)
 				if (assm_rx_is_active_edge = "01") then
 					assm_rx_is_active_debug_out <= '1';
-					assm_rx_is_active_debug_out_signal_counter <= debug_out_signal_pulse_len_i;
+					assm_rx_is_active_debug_out_signal_counter <= to_integer(signed(debug_out_signal_pulse_len_i));
 				else
 					if (assm_rx_is_active_debug_out_signal_counter > 0) then
 						assm_rx_is_active_debug_out_signal_counter <= assm_rx_is_active_debug_out_signal_counter - 1;
@@ -371,10 +371,10 @@ begin
 				
 					--funny magic numbers with no explanation :-)... definitely need to document this mechanism more in detail
 					if (fs_mode_i = "01") then					
-						first_transmit_start_counter <= first_transmit_start_counter_48k_i;
+						first_transmit_start_counter <= to_integer(signed(first_transmit_start_counter_48k_i));
 						
 					elsif (fs_mode_i = "00") then					
-						first_transmit_start_counter <= first_transmit_start_counter_44k1_i;
+						first_transmit_start_counter <= to_integer(signed(first_transmit_start_counter_44k1_i));
 					end if;
 					
 					first_transmit_start_counter_active <= '0';
@@ -453,13 +453,13 @@ begin
 			eth_rx_dv_watchdog_i				=> rxd_en_int,
 			eth_rx_consider_good_o				=> aes_rx_ok,
 
-			wd_aes_clk_timeout_i				=> wd_aes_clk_timeout_i,			-- 50@100MHz
-			wd_aes_rx_dv_timeout_i				=> wd_aes_rx_dv_timeout_i,			-- 15000@100MHz	
-			mdix_timer_1ms_reference_i			=> mdix_timer_1ms_reference_i,		-- 100000@100MHz
-			aes_clk_ok_counter_reference_i		=> aes_clk_ok_counter_reference_i,	-- 1000000@100MHz
+			wd_aes_clk_timeout_i				=> to_integer(signed(wd_aes_clk_timeout_i)),			-- 50@100MHz
+			wd_aes_rx_dv_timeout_i				=> to_integer(signed(wd_aes_rx_dv_timeout_i)),			-- 15000@100MHz	
+			mdix_timer_1ms_reference_i			=> to_integer(signed(mdix_timer_1ms_reference_i)),		-- 100000@100MHz
+			aes_clk_ok_counter_reference_i		=> to_integer(signed(aes_clk_ok_counter_reference_i)),	-- 1000000@100MHz
 			--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
-			mult_clk625_48k_i					=> mult_clk625_48k_i,				-- 8246337@100MHz
-			mult_clk625_44k1_i					=> mult_clk625_44k1_i				-- 7576322@100MHz
+			mult_clk625_48k_i					=> to_integer(signed(mult_clk625_48k_i)),				-- 8246337@100MHz
+			mult_clk625_44k1_i					=> to_integer(signed(mult_clk625_44k1_i))				-- 7576322@100MHz
 		);
 
 
