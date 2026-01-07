@@ -324,7 +324,7 @@ begin
 				--debug pulse generator for assm from clk
 				if (assm_active_edge = "01") then
 					assm_debug_out <= '1';
-					assm_debug_out_signal_counter <= to_integer(signed(debug_out_signal_pulse_len_i));
+					assm_debug_out_signal_counter <= to_integer(unsigned(debug_out_signal_pulse_len_i));
 				else
 					if (assm_debug_out_signal_counter > 0) then
 						assm_debug_out_signal_counter <= assm_debug_out_signal_counter - 1;
@@ -340,7 +340,7 @@ begin
 				--debug pulse generator for assm (tx-module)
 				if (assm_tx_is_active_edge = "01") then
 					assm_tx_is_active_debug_out <= '1';
-					assm_tx_is_active_debug_out_signal_counter <= to_integer(signed(debug_out_signal_pulse_len_i));
+					assm_tx_is_active_debug_out_signal_counter <= to_integer(unsigned(debug_out_signal_pulse_len_i));
 				else
 					if (assm_tx_is_active_debug_out_signal_counter > 0) then
 						assm_tx_is_active_debug_out_signal_counter <= assm_tx_is_active_debug_out_signal_counter - 1;
@@ -352,7 +352,7 @@ begin
 				--debug pulse generator for assm (rx-module)
 				if (assm_rx_is_active_edge = "01") then
 					assm_rx_is_active_debug_out <= '1';
-					assm_rx_is_active_debug_out_signal_counter <= to_integer(signed(debug_out_signal_pulse_len_i));
+					assm_rx_is_active_debug_out_signal_counter <= to_integer(unsigned(debug_out_signal_pulse_len_i));
 				else
 					if (assm_rx_is_active_debug_out_signal_counter > 0) then
 						assm_rx_is_active_debug_out_signal_counter <= assm_rx_is_active_debug_out_signal_counter - 1;
@@ -371,10 +371,10 @@ begin
 				
 					--funny magic numbers with no explanation :-)... definitely need to document this mechanism more in detail
 					if (fs_mode_i = "01") then					
-						first_transmit_start_counter <= to_integer(signed(first_transmit_start_counter_48k_i));
+						first_transmit_start_counter <= to_integer(unsigned(first_transmit_start_counter_48k_i));
 						
 					elsif (fs_mode_i = "00") then					
-						first_transmit_start_counter <= to_integer(signed(first_transmit_start_counter_44k1_i));
+						first_transmit_start_counter <= to_integer(unsigned(first_transmit_start_counter_44k1_i));
 					end if;
 					
 					first_transmit_start_counter_active <= '0';
