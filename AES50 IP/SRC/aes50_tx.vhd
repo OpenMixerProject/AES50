@@ -1402,7 +1402,7 @@ lc_ram : entity work.aes50_dual_port_bram (rtl)
 		addra_i 		=> lc_ram_a_addr,
 		addrb_i 		=> lc_ram_b_addr,
 		da_i 			=> lc_ram_di_a,
-		db_i 			=> (others => '0'),
+		db_i 			=> "00000000000000000000000000000000",
 		da_o 			=> lc_ram_do_a,
 		db_o 			=> lc_ram_do_b
 	);
