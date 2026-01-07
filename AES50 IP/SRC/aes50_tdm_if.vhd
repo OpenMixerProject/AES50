@@ -789,7 +789,7 @@ tdm_aux_ram : entity work.aes50_dual_port_bram (rtl)
 		addra_i => aux_ram_addr,
 		addrb_i => 0,
 		da_i => aux_ram_di,
-		db_i => (others => '0'),
+		db_i => "0000000000000000",
 		da_o => aux_ram_do,
 		db_o => open
 	);

@@ -453,13 +453,13 @@ begin
 			eth_rx_dv_watchdog_i				=> rxd_en_int,
 			eth_rx_consider_good_o				=> aes_rx_ok,
 
-			wd_aes_clk_timeout_i				=> to_integer(signed(wd_aes_clk_timeout_i)),			-- 50@100MHz
-			wd_aes_rx_dv_timeout_i				=> to_integer(signed(wd_aes_rx_dv_timeout_i)),			-- 15000@100MHz	
-			mdix_timer_1ms_reference_i			=> to_integer(signed(mdix_timer_1ms_reference_i)),		-- 100000@100MHz
-			aes_clk_ok_counter_reference_i		=> to_integer(signed(aes_clk_ok_counter_reference_i)),	-- 1000000@100MHz
+			wd_aes_clk_timeout_i				=> wd_aes_clk_timeout_i,			-- 50@100MHz
+			wd_aes_rx_dv_timeout_i				=> wd_aes_rx_dv_timeout_i,			-- 15000@100MHz	
+			mdix_timer_1ms_reference_i			=> mdix_timer_1ms_reference_i,		-- 100000@100MHz
+			aes_clk_ok_counter_reference_i		=> aes_clk_ok_counter_reference_i,	-- 1000000@100MHz
 			--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
-			mult_clk625_48k_i					=> to_integer(signed(mult_clk625_48k_i)),				-- 8246337@100MHz
-			mult_clk625_44k1_i					=> to_integer(signed(mult_clk625_44k1_i))				-- 7576322@100MHz
+			mult_clk625_48k_i					=> mult_clk625_48k_i,				-- 8246337@100MHz
+			mult_clk625_44k1_i					=> mult_clk625_44k1_i				-- 7576322@100MHz
 		);
 
 
