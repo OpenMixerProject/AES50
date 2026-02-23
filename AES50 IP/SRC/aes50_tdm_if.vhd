@@ -498,36 +498,77 @@ end process;
 
 process (clk100_i)
 begin
+-- following code for bit 0 of TDM-data directly after FrameSync
+--	if rising_edge(clk100_i) then
+--		if (bclk_counter = 1*32) then	
+--			shift_word_in_offset <= 8;
+--			shift_word_out_offset <= 7;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 2*32) then
+--			shift_word_in_offset <= 7;
+--			shift_word_out_offset <= 6;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 3*32) then
+--			shift_word_in_offset <= 6;
+--			shift_word_out_offset <= 5;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 4*32) then
+--			shift_word_in_offset <= 5;
+--			shift_word_out_offset <= 4;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 5*32) then
+--			shift_word_in_offset <= 4;
+--			shift_word_out_offset <= 3;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 6*32) then
+--			shift_word_in_offset <= 3;
+--			shift_word_out_offset <= 2;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 7*32) then
+--			shift_word_in_offset <= 2;
+--			shift_word_out_offset <= 1;
+--			shift_store_load <= '1';
+--		elsif (bclk_counter = 8*32) then
+--			shift_word_in_offset <= 1;	
+--			shift_word_out_offset <= 8;
+--			shift_store_load <= '1';		
+--		else
+--			shift_word_in_offset <= 8;	
+--			shift_word_out_offset <= 8;
+--			shift_store_load <= '0';
+--		end if;
+	
+-- following code for bit 31 of TDM-data directly after FrameSync
 	if rising_edge(clk100_i) then
-		if (bclk_counter = 1*32) then	
+		if (bclk_counter = 1*32+1) then	
 			shift_word_in_offset <= 8;
 			shift_word_out_offset <= 7;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 2*32) then
+		elsif (bclk_counter = 2*32+1) then
 			shift_word_in_offset <= 7;
 			shift_word_out_offset <= 6;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 3*32) then
+		elsif (bclk_counter = 3*32+1) then
 			shift_word_in_offset <= 6;
 			shift_word_out_offset <= 5;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 4*32) then
+		elsif (bclk_counter = 4*32+1) then
 			shift_word_in_offset <= 5;
 			shift_word_out_offset <= 4;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 5*32) then
+		elsif (bclk_counter = 5*32+1) then
 			shift_word_in_offset <= 4;
 			shift_word_out_offset <= 3;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 6*32) then
+		elsif (bclk_counter = 6*32+1) then
 			shift_word_in_offset <= 3;
 			shift_word_out_offset <= 2;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 7*32) then
+		elsif (bclk_counter = 7*32+1) then
 			shift_word_in_offset <= 2;
 			shift_word_out_offset <= 1;
 			shift_store_load <= '1';
-		elsif (bclk_counter = 8*32) then
+		elsif (bclk_counter = 1) then
 			shift_word_in_offset <= 1;	
 			shift_word_out_offset <= 8;
 			shift_store_load <= '1';		
