@@ -272,6 +272,13 @@ begin
 	end process;
 
 	--slice vector generator
+	
+	--FIX: Feb 25th 2026 
+	--During integration into Open-X32 project, it was detected that all odd channels are showing slight distortion behavior.
+	--To fix this, the position of the two padding bits in 48k mode while generating tmp_slice_vector was changed by one bit position.
+	--Even though this is !!not obvious!! from specification point of view (as the first padding bits come after 26 muxed PCM-bits and the second padding-bits after 28 - instead of both being 27 as per spec) this is confirmed to work. 
+	--Audio-Passthrough checked with audio-analyzer.
+	
 	process (tmp_sample_a, tmp_sample_b, tmp_ucm_a, tmp_ucm_b, fs_mode_i)
 	begin
 		if (fs_mode_i = "01") then
