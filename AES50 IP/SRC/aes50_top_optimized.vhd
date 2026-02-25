@@ -2,7 +2,8 @@
 -- Project      : AES50 VHDL IP-CORE
 -- File         : <aes50_top_optimized.vhd>
 -- Author       : Markus Noll (YetAnotherElectronicsChannel)
--- Created      : <2025-02-26>
+-- Version 1.0  : 2025-02-26 - First release
+-- Version 1.1  : 2026-02-24 - Changed reset-logic to include fifo-panics. Removed debug signals.
 --
 -- Description  : Top-Module for the AES50 IP Core
 --

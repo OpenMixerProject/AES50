@@ -300,7 +300,6 @@ if (rising_edge(clk100_i)) then
 				clock_health_good_o <= '1';
 			end if;
 		else
-			aes_clk_ok_counter <= 0;
 			clock_health_good_o <= '0';
 		end if;
 		
