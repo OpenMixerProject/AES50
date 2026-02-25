@@ -291,10 +291,10 @@ begin
 										tmp_sample_b(7)	&tmp_sample_a(7)&
 										tmp_sample_b(8)	&tmp_sample_a(8)&
 										tmp_sample_b(9)	&tmp_sample_a(9)&
-										tmp_sample_b(10)&
+										tmp_sample_b(10)&tmp_sample_a(10)&
 										
 									"00"&
-										tmp_sample_a(10)&tmp_sample_b(11)&
+										tmp_sample_b(11)&
 										tmp_sample_a(11)&tmp_sample_b(12)&
 										tmp_sample_a(12)&tmp_sample_b(13)&
 										tmp_sample_a(13)&tmp_sample_b(14)&

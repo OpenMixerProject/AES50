@@ -202,6 +202,11 @@ begin
 
 	end process;
 
+
+	--FIX: Feb 25th 2026 
+	--see comment in aes50-tx module where the muxed-slice-vector is generated.
+	--The reconsutrction of tmp_sample_a in 48k mode needs to follow the same bit-pattern.	
+	
 	process (tmp_slice_vector, fs_mode_i)
 	begin
 		if (fs_mode_i = "01") then
@@ -218,8 +223,8 @@ begin
 							tmp_slice_vector(20)&
 							tmp_slice_vector(22)&
 							tmp_slice_vector(24)&
-							tmp_slice_vector(26)&
 							
+							tmp_slice_vector(26+2)&							
 							tmp_slice_vector(28+2)&
 							tmp_slice_vector(30+2)&
 							tmp_slice_vector(32+2)&
@@ -311,7 +316,9 @@ begin
 							tmp_slice_vector(42+1+5)&
 							tmp_slice_vector(44+1+5)&
 							tmp_slice_vector(46+1+5);
-		
+		else
+			tmp_sample_a <= (others=>'0');
+			tmp_sample_b <= (others=>'0');
 		end if;
 	end process;
 

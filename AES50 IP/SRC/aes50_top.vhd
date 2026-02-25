@@ -217,7 +217,7 @@ begin
 	aes_ok_o		<= audio_clock_ok;
 	
 	--some debug signals to outside world to see what's happening
-	dbg_o 		<= assm_tx_is_active_debug_out & assm_rx_is_active_debug_out & assm_debug_out & rmii_crs_dv_i  & rmii_tx_en_o & enable_tx_assm_start & aes_rx_ok & mclk_internal;
+	dbg_o 		<= assm_tx_is_active_debug_out & assm_rx_is_active_debug_out & assm_debug_out & rmii_crs_dv_i  & txd_en_int & enable_tx_assm_start & aes_rx_ok & mclk_internal;
 
 	--assign tdm/i2s signals
 	tdm_o		<= tdm_internal_o when (tdm8_i2s_mode_i='0') else (others=>'0');
