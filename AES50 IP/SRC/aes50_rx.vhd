@@ -318,11 +318,7 @@ begin
 							tmp_slice_vector(46+1+5);
 		else
 			tmp_sample_a <= (others=>'0');
-<<<<<<< HEAD
 			tmp_sample_b <= (others=>'0');
-=======
-			tmp_sample_b <= (others=>'0');
->>>>>>> 41ad4f6 (Fixed noise on uneven channels. Fixed reset-behavior.)
 		end if;
 	end process;
 
