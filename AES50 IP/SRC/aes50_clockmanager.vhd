@@ -97,12 +97,12 @@ port (
 	eth_rx_consider_good_o						: out std_logic;
 	
 	
-	wd_aes_clk_timeout_i						: in std_logic_vector(5 downto 0); 			-- 50@100MHz
+	wd_aes_clk_timeout_i						: in std_logic_vector(5 downto 0); 	-- 50@100MHz
 	wd_aes_rx_dv_timeout_i					    : in std_logic_vector(14 downto 0);	-- 15000@100MHz	
-	mdix_timer_1ms_reference_i					: in std_logic_vector(16 downto 0);		-- 100000@100MHz
+	mdix_timer_1ms_reference_i					: in std_logic_vector(16 downto 0);	-- 100000@100MHz
 	aes_clk_ok_counter_reference_i				: in std_logic_vector(19 downto 0);	-- 1000000@100MHz
 	--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
-	mult_clk625_48k_i							: in std_logic_vector(31 downto 0);			-- 8246337@100MHz
+	mult_clk625_48k_i							: in std_logic_vector(31 downto 0);	-- 8246337@100MHz
 	mult_clk625_44k1_i							: in std_logic_vector(31 downto 0)		-- 7576322@100MHz
 	
 	);
@@ -212,10 +212,10 @@ begin
 								'0';
 					
 
-	pll_mult_value_o 	<= 		std_logic_vector(to_unsigned(mult_clk_x16, 32))		when (sys_mode_i="00" or (sys_mode_i="10" and tdm8_i2s_mode_i='1')) else
+	pll_mult_value_o 	<= 		std_logic_vector(to_unsigned(mult_clk_x16, 32))	when (sys_mode_i="00" or (sys_mode_i="10" and tdm8_i2s_mode_i='1')) else
 								mult_clk625_44k1_i 	when (sys_mode_i="01" and fs_mode_i="00") else
 								mult_clk625_48k_i		when (sys_mode_i="01" and fs_mode_i="01") else
-								std_logic_vector(to_unsigned(mult_clk_x4, 32));		--sys_mode=10 and tdm8-mode
+								std_logic_vector(to_unsigned(mult_clk_x4, 32));	--sys_mode=10 and tdm8-mode
 
 
 
@@ -300,6 +300,7 @@ if (rising_edge(clk100_i)) then
 				clock_health_good_o <= '1';
 			end if;
 		else
+			aes_clk_ok_counter <= 0;
 			clock_health_good_o <= '0';
 		end if;
 		
@@ -352,7 +353,6 @@ end process;
 
 process (clk_1024xfs_from_pll_i)
 begin
-
 
 if (rising_edge(clk_1024xfs_from_pll_i)) then
 

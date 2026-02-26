@@ -633,7 +633,8 @@ begin
 			
 			if (tdm8_i2s_mode_i = '0') then
 				--clock needs to be inverted because otherwise it looks from external as it would shift on rising-edge. the process with double-ff the BCLK takes too long otherwise for a 12.228 MHz clock
-				bclk_shift <= bclk_shift(1 downto 0)&(not tdm_bclk_i);	
+				--bclk_shift <= bclk_shift(1 downto 0)&(not tdm_bclk_i);	
+				bclk_shift <= bclk_shift(1 downto 0)&tdm_bclk_i;	
 			else
 				bclk_shift <= bclk_shift(1 downto 0)&tdm_bclk_i;
 			end if;
