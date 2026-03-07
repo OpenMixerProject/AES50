@@ -176,6 +176,7 @@ architecture rtl of aes50_top is
 	signal 	fifo_aes_to_tdm_audio_data						: std_logic_vector (23 downto 0);
 	signal  fifo_aes_to_tdm_audio_ch0_marker				: std_logic := '0';
 	signal	fifo_aes_to_tdm_aux_data						: std_logic_vector (15 downto 0);
+	signal	fifo_aes_to_tdm_aux_start_marker				: std_logic;
 	signal	fifo_aes_to_tdm_audio_rd_en						: std_logic := '0';
 	signal	fifo_aes_to_tdm_aux_rd_en						: std_logic := '0';
 	signal	fifo_aes_to_tdm_audio_fifo_count 				: integer range 1056 - 1 downto 0;
@@ -192,6 +193,7 @@ architecture rtl of aes50_top is
 	signal 	fifo_tdm_to_aes_audio_data						: std_logic_vector (23 downto 0) := (others=>'0');
 	signal  fifo_tdm_to_aes_audio_ch0_marker				: std_logic := '0';
 	signal 	fifo_tdm_to_aes_aux_data						: std_logic_vector (15 downto 0) := (others=>'0');
+	signal  fifo_tdm_to_aes_aux_start_marker				: std_logic := '0';
 	signal 	fifo_tdm_to_aes_audio_wr_en						: std_logic := '0';
 	signal 	fifo_tdm_to_aes_aux_wr_en						: std_logic := '0';
 	signal  fifo_tdm_to_aes_misalign_panic					: std_logic := '0';
@@ -511,6 +513,7 @@ begin
 			audio_o								=> fifo_tdm_to_aes_audio_data,
 			audio_ch0_marker_o					=> fifo_tdm_to_aes_audio_ch0_marker,
 			aux_o								=> fifo_tdm_to_aes_aux_data,
+			aux_start_marker_o					=> fifo_tdm_to_aes_aux_start_marker,
 			audio_out_wr_en_o					=> fifo_tdm_to_aes_audio_wr_en,
 			aux_out_wr_en_o						=> fifo_tdm_to_aes_aux_wr_en,
 			
@@ -519,12 +522,13 @@ begin
 			audio_i								=> fifo_aes_to_tdm_audio_data,
 			audio_ch0_marker_i					=> fifo_aes_to_tdm_audio_ch0_marker,
 			aux_i								=> fifo_aes_to_tdm_aux_data,
+			aux_start_marker_i					=> fifo_aes_to_tdm_aux_start_marker,
 			audio_in_rd_en_o					=> fifo_aes_to_tdm_audio_rd_en,
 			aux_in_rd_en_o						=> fifo_aes_to_tdm_aux_rd_en,
 			fifo_fill_count_audio_i 			=> fifo_aes_to_tdm_audio_fifo_count,
 			fifo_fill_count_aux_i				=> fifo_aes_to_tdm_aux_fifo_count,
 			
-			audio_fifo_misalign_panic_o			=> fifo_aes_to_tdm_misalign_panic,
+			fifo_misalign_panic_o				=> fifo_aes_to_tdm_misalign_panic,
 			
 			tdm_debug_o 						=> open
 		
@@ -570,10 +574,12 @@ begin
 			audio_i 							=> fifo_tdm_to_aes_audio_data,
 			audio_ch0_marker_i					=> fifo_tdm_to_aes_audio_ch0_marker,
 			aux_i								=> fifo_tdm_to_aes_aux_data,
+			aux_start_marker_i					=> fifo_tdm_to_aes_aux_start_marker,
 			audio_in_wr_en_i 					=> fifo_tdm_to_aes_audio_wr_en,
 			aux_in_wr_en_i 						=> fifo_tdm_to_aes_aux_wr_en,
+			aux_request_o						=> open,
 			
-			audio_fifo_misalign_panic_o			=> fifo_tdm_to_aes_misalign_panic,
+			fifo_misalign_panic_o				=> fifo_tdm_to_aes_misalign_panic,
 			
 			phy_tx_data_o 						=> phy_tx_data,        
 			phy_tx_eof_o  						=> phy_tx_eof,        
@@ -600,7 +606,7 @@ begin
 			audio_ch0_marker_o					=> fifo_aes_to_tdm_audio_ch0_marker,
 			
 			aux0_o								=> fifo_aes_to_tdm_aux_data,
-			aux0_start_marker_o					=> open,
+			aux0_start_marker_o					=> fifo_aes_to_tdm_aux_start_marker,
 			
 			aux1_o								=> fifo_aes_to_uart_aux_data,
 			aux1_start_marker_o					=> fifo_aes_to_uart_aux_start_marker,

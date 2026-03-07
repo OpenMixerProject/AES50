@@ -53,6 +53,7 @@ port (
 	audio_o							: out std_logic_vector (23 downto 0);
 	audio_ch0_marker_o				: out std_logic;
 	aux_o							: out std_logic_vector (15 downto 0);
+	aux_start_marker_o				: out std_logic;
 	audio_out_wr_en_o				: out std_logic;
 	aux_out_wr_en_o					: out std_logic;
 	
@@ -61,12 +62,13 @@ port (
 	audio_i							: in std_logic_vector(23 downto 0);
 	audio_ch0_marker_i				: in std_logic;
 	aux_i							: in std_logic_vector(15 downto 0);
+	aux_start_marker_i				: in std_logic;
 	audio_in_rd_en_o				: out std_logic;
 	aux_in_rd_en_o					: out std_logic;
 	fifo_fill_count_audio_i 		: in integer range 1056 - 1 downto 0;
 	fifo_fill_count_aux_i			: in integer range 176 - 1 downto 0;
 	
-	audio_fifo_misalign_panic_o		: out std_logic;
+	fifo_misalign_panic_o			: out std_logic;
 	
 	tdm_debug_o						: out std_logic_vector(3 downto 0)
 	
@@ -180,6 +182,7 @@ begin
 			audio_o <= (others=>'0');
 			audio_ch0_marker_o <= '0';
 			aux_o	 <= (others=>'0');
+			aux_start_marker_o <= '0';
 			audio_out_wr_en_o <= '0';
 			aux_out_wr_en_o <= '0';
 			
@@ -313,6 +316,12 @@ begin
 			--now let's iterate over the local aux storage buffer the write it to FIFO
 			elsif (state_fifo_writer = 9) then
 				aux_o <= aux_ram_do;
+				if (tmp_aux_offset = 0 or tmp_aux_offset = 44) then
+					aux_start_marker_o <= '1';
+				else
+					aux_start_marker_o <= '0';
+				end if;
+				
 				aux_out_wr_en_o <= '1';
 				state_fifo_writer <= 10;
 			
@@ -358,7 +367,7 @@ begin
 			audio_in_rd_en_o <= '0';
 			aux_in_rd_en_o <= '0';
 			
-			audio_fifo_misalign_panic_o <= '0';
+			fifo_misalign_panic_o <= '0';
 			
 			debug_fifo_to_serdes_process <= '0';
 			
@@ -372,9 +381,9 @@ begin
 				
 			
 				--check if FIFO matches with CH0 
-				if (audio_ch0_marker_i /= '1') then
+				if (audio_ch0_marker_i /= '1' or aux_start_marker_i /= '1') then
 					--indicate panic signal -> will lead to system reset -> we don't have anything to do further here
-					audio_fifo_misalign_panic_o <= '1';
+					fifo_misalign_panic_o <= '1';
 				end if;
 				state_fifo_reader <= 1;
 				audio_in_rd_en_o <= '1';
