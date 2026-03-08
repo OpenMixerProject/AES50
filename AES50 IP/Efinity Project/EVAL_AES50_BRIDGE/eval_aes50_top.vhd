@@ -197,6 +197,7 @@ begin
 			fs_mode_i								=> fs_mode,
 			sys_mode_i								=> sys_mode,
 			tdm8_i2s_mode_i							=> tdm8_i2s_mode,
+			aux_tx_tdm_uart_select_i				=> '1',
 			
 			rmii_crs_dv_i  							=> AES_RX_DV,        
 			rmii_rxd_i   							=> AES_RXD,         
@@ -250,7 +251,8 @@ begin
 			--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
 			mult_clk625_48k_i						=>	8246337,
 			mult_clk625_44k1_i						=>	7576322,
-			uart_clks_per_bit_i						=> 	868
+			uart_clks_per_bit_i						=> 	868,
+			uart_timeout_clks_i						=>  1000000
 			
 			
 			--variables for if coreclock = 80 MHz
@@ -264,8 +266,9 @@ begin
 			--aes_clk_ok_counter_reference_i		=>	800000,
 			--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
 			--mult_clk625_48k_i						=>	10307922,
-			--mult_clk625_44k1_i					=>	9470403
-			--uart_clks_per_bit_i						=> 	694
+			--mult_clk625_44k1_i					=>	9470403,
+			--uart_clks_per_bit_i					=> 	694,
+			--uart_timeout_clks_i					=>  800000
 			);
 			
 

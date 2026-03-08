@@ -4,7 +4,7 @@
 -- Author       : Markus Noll (YetAnotherElectronicsChannel)
 -- Created      : <2026-03-05>
 --
--- Description  : Decoder for the AES50 Aux Bitstream
+-- Description  : Decodes the AES50 Aux Bitstream and sends received data out via UART
 --
 -- License      : GNU General Public License v3.0 or later (GPL-3.0-or-later)
 --
@@ -77,7 +77,7 @@ architecture rtl of aes50_aux_decoder is
 	
 	signal fifo_to_uart_data								: std_logic_vector(7 downto 0);
 	signal fifo_to_uart_rd_en								: std_logic;
-	signal fifo_to_uart_count								: integer range 4095 downto 0;
+	signal fifo_to_uart_count								: integer range 2047 downto 0;
 	signal fifo_uart_tx_state								: integer range 15 downto 0;
 
 begin
@@ -227,7 +227,6 @@ begin
 	
 	
 	aes50_uart_tx: entity work.aes50_uart_tx(rtl)
-
 	port map (
 		i_Clk       		=> clk100_core_i,
 		i_TX_DV     		=> uart_tx_enable,
@@ -239,7 +238,7 @@ begin
 	);
 		
 	
-	aux_rx_uart_data_buffer : entity work.aes50_ring_buffer(rtl)
+	uart_tx_data_buffer : entity work.aes50_ring_buffer(rtl)
 	generic map (
 		RAM_WIDTH 		=> 8, 	
 		RAM_DEPTH 		=> 2048 		

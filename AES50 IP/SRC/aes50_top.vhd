@@ -56,6 +56,7 @@ port (
 		fs_mode_i							: in std_logic_vector(1 downto 0);
 		sys_mode_i							: in std_logic_vector(1 downto 0);
 		tdm8_i2s_mode_i						: in std_logic;
+		aux_tx_tdm_uart_select_i			: in std_logic;
 		
 		--connection to phy
 		rmii_crs_dv_i 						: in  std_logic;        
@@ -119,7 +120,8 @@ port (
 		mult_clk625_44k1_i					: in integer;								-- 7576322@100MHz
 		
 		--uart speed configuration
-		uart_clks_per_bit_i					: in integer								--868 for 115.200 baud @ 100 MHz				
+		uart_clks_per_bit_i					: in integer;								--868 for 115.200 baud @ 100 MHz
+		uart_timeout_clks_i     			: in integer								--1000000 for 10ms @ 100 MHz
 		);
 end aes50_top;
 
@@ -184,7 +186,7 @@ architecture rtl of aes50_top is
 	signal	fifo_aes_to_tdm_aux_rd_en						: std_logic := '0';
 	signal	fifo_aes_to_tdm_audio_fifo_count 				: integer range 1056 - 1 downto 0;
 	signal	fifo_aes_to_tdm_aux_fifo_count 					: integer range 176 - 1 downto 0;	
-	signal  fifo_aes_to_tdm_misalign_panic					: std_logic := '0';
+	
 	
 	--fifo signals from aes-rx to UART
 	signal fifo_aes_to_uart_aux_data						: std_logic_vector (15 downto 0);
@@ -192,14 +194,34 @@ architecture rtl of aes50_top is
 	signal fifo_aes_to_uart_aux_rd_en						: std_logic;
 	signal fifo_aes_to_uart_aux_fifo_count					: integer range 176 - 1 downto 0;
 	
+	
 	--fifo signals from tdm to aes-tx
 	signal 	fifo_tdm_to_aes_audio_data						: std_logic_vector (23 downto 0) := (others=>'0');
 	signal  fifo_tdm_to_aes_audio_ch0_marker				: std_logic := '0';
-	signal 	fifo_tdm_to_aes_aux_data						: std_logic_vector (15 downto 0) := (others=>'0');
-	signal  fifo_tdm_to_aes_aux_start_marker				: std_logic := '0';
 	signal 	fifo_tdm_to_aes_audio_wr_en						: std_logic := '0';
-	signal 	fifo_tdm_to_aes_aux_wr_en						: std_logic := '0';
-	signal  fifo_tdm_to_aes_misalign_panic					: std_logic := '0';
+	
+	--fifo signals from tdm to aux-mux
+	signal 	fifo_tdm_to_mux_aux_data						: std_logic_vector (15 downto 0) := (others=>'0');
+	signal  fifo_tdm_to_mux_aux_start_marker				: std_logic := '0';
+	signal 	fifo_tdm_to_mux_aux_wr_en						: std_logic := '0';
+	
+	--fifo signals from aux-uart-encoder to aux-mux
+	signal 	fifo_auxenc_to_mux_aux_data						: std_logic_vector (15 downto 0) := (others=>'0');
+	signal  fifo_auxenc_to_mux_aux_start_marker				: std_logic := '0';
+	signal 	fifo_auxenc_to_mux_aux_wr_en					: std_logic := '0';
+	
+	--fifo signals from aux-mux to aes50-tx
+	signal 	fifo_mux_to_aes_aux_data						: std_logic_vector (15 downto 0) := (others=>'0');
+	signal  fifo_mux_to_aes_aux_start_marker				: std_logic := '0';
+	signal 	fifo_mux_to_aes_aux_wr_en						: std_logic := '0';
+	
+	signal  aux_encoder_request_data						: std_logic := '0';
+	
+	--panic signals
+	signal  fifo_aestx_misalign_panic						: std_logic := '0';
+	signal  fifo_tdm_misalign_panic							: std_logic := '0';
+	
+	
 	
 	--signals for assm handling
 	signal 	assm_remote										: std_logic;
@@ -219,7 +241,7 @@ architecture rtl of aes50_top is
 	signal 	assm_rx_is_active_debug_out_signal_counter		: integer range 1000000 downto 0;
 
 
-	
+
 
 	
 begin
@@ -254,7 +276,7 @@ begin
 	begin
 		if (rising_edge(clk100_i)) then
 		
-			if (rst_i = '1' or fifo_tdm_to_aes_misalign_panic = '1' or fifo_aes_to_tdm_misalign_panic = '1') then
+			if (rst_i = '1' or fifo_aestx_misalign_panic = '1' or fifo_tdm_misalign_panic = '1') then
 				
 				--phy reset
 				phy_rst_cnt <= 100000;
@@ -504,10 +526,10 @@ begin
 			--FIFO interface to aes50-tx	
 			audio_o								=> fifo_tdm_to_aes_audio_data,
 			audio_ch0_marker_o					=> fifo_tdm_to_aes_audio_ch0_marker,
-			aux_o								=> fifo_tdm_to_aes_aux_data,
-			aux_start_marker_o					=> fifo_tdm_to_aes_aux_start_marker,
+			aux_o								=> fifo_tdm_to_mux_aux_data,
+			aux_start_marker_o					=> fifo_tdm_to_mux_aux_start_marker,
 			audio_out_wr_en_o					=> fifo_tdm_to_aes_audio_wr_en,
-			aux_out_wr_en_o						=> fifo_tdm_to_aes_aux_wr_en,
+			aux_out_wr_en_o						=> fifo_tdm_to_mux_aux_wr_en,
 			
 			
 			--FIFO interface to aes50-rx
@@ -520,7 +542,7 @@ begin
 			fifo_fill_count_audio_i 			=> fifo_aes_to_tdm_audio_fifo_count,
 			fifo_fill_count_aux_i				=> fifo_aes_to_tdm_aux_fifo_count,
 			
-			fifo_misalign_panic_o				=> fifo_aes_to_tdm_misalign_panic,
+			fifo_misalign_panic_o				=> fifo_tdm_misalign_panic,
 			
 			tdm_debug_o 						=> open
 		
@@ -552,7 +574,12 @@ begin
 		);	
 
 
-
+	
+	--aux data mux for aes50-tx direction. Source Aux-Data either from Aux-Over-TDM or through Aux-Over-Uart-Input
+	fifo_mux_to_aes_aux_data 					<= fifo_auxenc_to_mux_aux_data 				when (aux_tx_tdm_uart_select_i='1') else fifo_tdm_to_mux_aux_data;
+	fifo_mux_to_aes_aux_start_marker 			<= fifo_auxenc_to_mux_aux_start_marker 		when (aux_tx_tdm_uart_select_i='1') else fifo_tdm_to_mux_aux_start_marker;
+	fifo_mux_to_aes_aux_wr_en					<= fifo_auxenc_to_mux_aux_wr_en				when (aux_tx_tdm_uart_select_i='1') else fifo_tdm_to_mux_aux_wr_en;
+	
 	aes50tx : entity work.aes50_tx(rtl)
 		port map(
 		
@@ -565,13 +592,13 @@ begin
 			
 			audio_i 							=> fifo_tdm_to_aes_audio_data,
 			audio_ch0_marker_i					=> fifo_tdm_to_aes_audio_ch0_marker,
-			aux_i								=> fifo_tdm_to_aes_aux_data,
-			aux_start_marker_i					=> fifo_tdm_to_aes_aux_start_marker,
+			aux_i								=> fifo_mux_to_aes_aux_data,
+			aux_start_marker_i					=> fifo_mux_to_aes_aux_start_marker,
 			audio_in_wr_en_i 					=> fifo_tdm_to_aes_audio_wr_en,
-			aux_in_wr_en_i 						=> fifo_tdm_to_aes_aux_wr_en,
-			aux_request_o						=> open,
+			aux_in_wr_en_i 						=> fifo_mux_to_aes_aux_wr_en,
+			aux_request_o						=> aux_encoder_request_data,
 			
-			fifo_misalign_panic_o				=> fifo_tdm_to_aes_misalign_panic,
+			fifo_misalign_panic_o				=> fifo_aestx_misalign_panic,
 			
 			phy_tx_data_o 						=> phy_tx_data,        
 			phy_tx_eof_o  						=> phy_tx_eof,        
@@ -642,6 +669,26 @@ begin
 			);
 		
 	
+	aes50_aux_encoder : entity work.aes50_aux_encoder(rtl)
+	
+		port map (
+			clk100_core_i    					=> clk100_i,
+			rst_i            					=> aes_tx_rst,              
+			
+			uart_i                  			=> uart_i,
+			uart_clks_per_bit_i     			=> uart_clks_per_bit_i,
+			uart_timeout_clks_i          		=> uart_timeout_clks_i,
+								
+			fs_mode_i               			=> fs_mode_i,
+			aux_request_i           			=> aux_encoder_request_data,
+			
+			aux_o                   			=> fifo_auxenc_to_mux_aux_data,
+			aux_data_start_marker_o 			=> fifo_auxenc_to_mux_aux_start_marker,
+			aux_out_wr_en_o         			=> fifo_auxenc_to_mux_aux_wr_en
+			
+					
+			);
+		
 		
 		
 end architecture;
