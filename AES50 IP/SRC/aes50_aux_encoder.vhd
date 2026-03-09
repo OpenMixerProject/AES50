@@ -37,8 +37,8 @@ entity aes50_aux_encoder is
         rst_i                   : in  std_logic;
         
         uart_i                  : in  std_logic;
-        uart_clks_per_bit_i     : in  integer;
-        uart_timeout_clks_i     : in  integer;
+        uart_clks_per_bit_i     : in  std_logic_vector(9 downto 0);
+        uart_timeout_clks_i     : in  std_logic_vector(19 downto 0);
                        
         fs_mode_i               : in  std_logic_vector(1 downto 0); 
         aux_request_i           : in  std_logic; 
@@ -99,7 +99,7 @@ begin
                     data_ready_to_send <= '0';
 					
                 elsif fifo_empty = '0' then
-                    if timeout_cnt < uart_timeout_clks_i then
+                    if timeout_cnt < to_integer(unsigned(uart_timeout_clks_i)) then
                         timeout_cnt <= timeout_cnt + 1;
                     else
                         data_ready_to_send <= '1';

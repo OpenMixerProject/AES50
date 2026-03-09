@@ -25,7 +25,7 @@ entity aes50_uart_tx is
     i_Clk       		: in  std_logic;
     i_TX_DV     		: in  std_logic;
     i_TX_Byte   		: in  std_logic_vector(7 downto 0);
-	i_CLKS_PER_BIT 		: in integer;     
+	i_CLKS_PER_BIT 		: in std_logic_vector(9 downto 0);     
     o_TX_Active 		: out std_logic;
     o_TX_Serial 		: out std_logic;
     o_TX_Done   		: out std_logic
@@ -73,7 +73,7 @@ begin
           o_TX_Serial <= '0';
  
           -- Wait i_CLKS_PER_BIT-1 clock cycles for start bit to finish
-          if r_Clk_Count < i_CLKS_PER_BIT-1 then
+          if r_Clk_Count < to_integer(unsigned(i_CLKS_PER_BIT))-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_TX_Start_Bit;
           else
@@ -85,7 +85,7 @@ begin
         when s_TX_Data_Bits =>
           o_TX_Serial <= r_TX_Data(r_Bit_Index);
            
-          if r_Clk_Count < i_CLKS_PER_BIT-1 then
+          if r_Clk_Count < to_integer(unsigned(i_CLKS_PER_BIT))-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_TX_Data_Bits;
           else
@@ -106,7 +106,7 @@ begin
           o_TX_Serial <= '1';
  
           -- Wait i_CLKS_PER_BIT-1 clock cycles for Stop bit to finish
-          if r_Clk_Count < i_CLKS_PER_BIT-1 then
+          if r_Clk_Count < to_integer(unsigned(i_CLKS_PER_BIT))-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_TX_Stop_Bit;
           else
