@@ -1156,101 +1156,106 @@ begin
 						phy_tx_data_o <= mac_dest(0);
 						phy_tx_valid_o <= '1';
 						P2_SubState <= 1;
-						
-					--rmii-module will signal by phy_tx_ready_i that it can consume the next byte of data....
-					--send mac-destination header
-					elsif P2_SubState=1 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_dest(1);				
-						P2_SubState <= 2;				
-					elsif P2_SubState=2 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_dest(2);				
-						P2_SubState <= 3;
-					elsif P2_SubState=3 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_dest(3);				
-						P2_SubState <= 4;
-					elsif P2_SubState=4 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_dest(4);				
-						P2_SubState <= 5;
-					elsif P2_SubState=5 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_dest(5);				
-						P2_SubState <= 6;	
+					else
+						--rmii-module will signal by phy_tx_ready_i that it can consume the next byte of data....
+						--send mac-destination header
+						if phy_tx_ready_i = '1' then
+							if P2_SubState=1 then
+								phy_tx_data_o <= mac_dest(1);				
+								P2_SubState <= 2;				
+							elsif P2_SubState=2 then
+								phy_tx_data_o <= mac_dest(2);				
+								P2_SubState <= 3;
+							elsif P2_SubState=3 then
+								phy_tx_data_o <= mac_dest(3);				
+								P2_SubState <= 4;
+							elsif P2_SubState=4 then
+								phy_tx_data_o <= mac_dest(4);				
+								P2_SubState <= 5;
+							elsif P2_SubState=5 then
+								phy_tx_data_o <= mac_dest(5);				
+								P2_SubState <= 6;	
 
-					--send mac-source address
-					elsif P2_SubState=6 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_source(0);				
-						P2_SubState <= 7;
-					elsif P2_SubState=7 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_source(1);				
-						P2_SubState <= 8;
-					elsif P2_SubState=8 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_source(2);				
-						P2_SubState <= 9;
-					elsif P2_SubState=9 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_source(3);				
-						P2_SubState <= 10;
-					elsif P2_SubState=10 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_source(4);				
-						P2_SubState <= 11;	
-					elsif P2_SubState=11 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= mac_source(5);				
-						P2_SubState <= 12;	
+							--send mac-source address
+							elsif P2_SubState=6 then
+								phy_tx_data_o <= mac_source(0);				
+								P2_SubState <= 7;
+							elsif P2_SubState=7 then
+								phy_tx_data_o <= mac_source(1);				
+								P2_SubState <= 8;
+							elsif P2_SubState=8 then
+								phy_tx_data_o <= mac_source(2);				
+								P2_SubState <= 9;
+							elsif P2_SubState=9 then
+								phy_tx_data_o <= mac_source(3);				
+								P2_SubState <= 10;
+							elsif P2_SubState=10 then
+								phy_tx_data_o <= mac_source(4);				
+								P2_SubState <= 11;	
+							elsif P2_SubState=11 then
+								phy_tx_data_o <= mac_source(5);				
+								P2_SubState <= 12;	
 
-					--send ether type tx
-					elsif P2_SubState=12 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= ether_type(0);				
-						P2_SubState <= 13;	
-					elsif P2_SubState=13 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= ether_type(1);				
-						P2_SubState <= 14;					
-						
-					--send protocol id
-					elsif P2_SubState=14 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= protocol_identifier;				
-						P2_SubState <= 15;		
-										
-					--send user octet
-					elsif P2_SubState=15 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= user_octet;				
-						P2_SubState <= 16;	
+							--send ether type tx
+							elsif P2_SubState=12 then
+								phy_tx_data_o <= ether_type(0);				
+								P2_SubState <= 13;	
+							elsif P2_SubState=13 then
+								phy_tx_data_o <= ether_type(1);				
+								P2_SubState <= 14;					
+								
+							--send protocol id
+							elsif P2_SubState=14 then
+								phy_tx_data_o <= protocol_identifier;				
+								P2_SubState <= 15;		
+												
+							--send user octet
+							elsif P2_SubState=15 then
+								phy_tx_data_o <= user_octet;				
+								P2_SubState <= 16;	
 
-					--send frame format identification header
-					elsif P2_SubState=16 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= frame_format_id(0);				
-						P2_SubState <= 17;
-						
-					elsif P2_SubState=17 and phy_tx_ready_i = '1' then
-						
-						--now let's check if we had an active assm marker for this frame and send with flag or not...
-						if (assm_do = '0') then
-							phy_tx_data_o <= frame_format_id(1);	
-						else
-							phy_tx_data_o <= frame_format_id(6);
-						end if;				
-						
-						P2_SubState <= 18;
-						
-					elsif P2_SubState=18 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= frame_format_id(2);				
-						P2_SubState <= 19;
-					elsif P2_SubState=19 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= frame_format_id(3);				
-						P2_SubState <= 20;
-					elsif P2_SubState=20 and phy_tx_ready_i = '1' then
-						phy_tx_data_o <= frame_format_id(4);				
-						P2_SubState <= 21;	
-					elsif P2_SubState=21 and phy_tx_ready_i = '1' then
-					
-						--now let's check which CRC we use depending if we had been sending an ASSM marker or not
-						if (assm_do = '0') then
-							phy_tx_data_o <= frame_format_id(5);
-						else
-							phy_tx_data_o <= frame_format_id(7);
+							--send frame format identification header
+							elsif P2_SubState=16 then
+								phy_tx_data_o <= frame_format_id(0);				
+								P2_SubState <= 17;
+								
+							elsif P2_SubState=17 then
+								
+								--now let's check if we had an active assm marker for this frame and send with flag or not...
+								if (assm_do = '0') then
+									phy_tx_data_o <= frame_format_id(1);	
+								else
+									phy_tx_data_o <= frame_format_id(6);
+								end if;				
+								
+								P2_SubState <= 18;
+								
+							elsif P2_SubState=18 then
+								phy_tx_data_o <= frame_format_id(2);				
+								P2_SubState <= 19;
+							elsif P2_SubState=19 then
+								phy_tx_data_o <= frame_format_id(3);				
+								P2_SubState <= 20;
+							elsif P2_SubState=20 then
+								phy_tx_data_o <= frame_format_id(4);				
+								P2_SubState <= 21;	
+							elsif P2_SubState=21 then
+							
+								--now let's check which CRC we use depending if we had been sending an ASSM marker or not
+								if (assm_do = '0') then
+									phy_tx_data_o <= frame_format_id(5);
+								else
+									phy_tx_data_o <= frame_format_id(7);
+								end if;
+								
+								assm_do <= '0';
+								--now transmit of data begins
+								P2_State <= TransmitData;
+								P2_SubState <= 0;	
+							end if;
+							
 						end if;
-						
-						assm_do <= '0';
-						--now transmit of data begins
-						P2_State <= TransmitData;
-						P2_SubState <= 0;	
+					
 					end if;
 					
 				--elsif P2_SubState = 0 and phy_tx_ram_preload = '1' then

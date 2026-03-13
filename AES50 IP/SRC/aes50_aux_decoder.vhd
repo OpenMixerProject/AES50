@@ -110,12 +110,13 @@ begin
                 aux_in_rd_en_o  <= '0';
 				
                 
-                if is_processing = '0' and fifo_wait_data = 0 then
-                    if fifo_fill_count_aux_i > 0 then
-                        aux_in_rd_en_o <= '1';
-                        fifo_wait_data  <= 1;
-                    end if;
-					
+                if fifo_wait_data = 0 then
+							if is_processing = '0' then
+								if fifo_fill_count_aux_i > 0 then
+									aux_in_rd_en_o <= '1';
+									fifo_wait_data  <= 1;
+								end if;
+							end if;
                 elsif fifo_wait_data = 1 then
                     fifo_wait_data <= 2;
 					
@@ -132,7 +133,6 @@ begin
 				
 
 				if is_processing = '1' then
-
 					if G_MSB_FIRST then
 						current_bit := shift_reg_in(15 - bit_idx);
 					else

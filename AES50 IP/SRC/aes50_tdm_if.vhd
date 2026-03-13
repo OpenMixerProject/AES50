@@ -376,24 +376,23 @@ begin
 			--let's wait for wclk-sync
 			--if we are in 44k1 mode, we wait until we have 528 audio- and 88 aux-samples
 			--in 48k mode, we wait until 288 audio- und 44 aux-samples
-			if (wclk_sync_fetch_data_shift="10" and state_fifo_reader = 0 and 	
-					( (fifo_fill_count_audio_i>=288 and fifo_fill_count_aux_i>=44 and fs_mode_i="01") or (fifo_fill_count_audio_i>=528 and fifo_fill_count_aux_i>=88 and fs_mode_i="00")  )   ) then
-				
-			
-				--check if FIFO matches with CH0 
-				if (audio_ch0_marker_i /= '1' or aux_start_marker_i /= '1') then
-					--indicate panic signal -> will lead to system reset -> we don't have anything to do further here
-					fifo_misalign_panic_o <= '1';
+			if (state_fifo_reader = 0) then
+				if (wclk_sync_fetch_data_shift="10" and ( (fifo_fill_count_audio_i>=288 and fifo_fill_count_aux_i>=44 and fs_mode_i="01") or (fifo_fill_count_audio_i>=528 and fifo_fill_count_aux_i>=88 and fs_mode_i="00")  )   ) then
+					--check if FIFO matches with CH0 
+					if (audio_ch0_marker_i /= '1' or aux_start_marker_i /= '1') then
+						--indicate panic signal -> will lead to system reset -> we don't have anything to do further here
+						fifo_misalign_panic_o <= '1';
+					end if;
+					state_fifo_reader <= 1;
+					audio_in_rd_en_o <= '1';
+					
+					serdes_counter_out <= 0;
+					sample_serdes_counter_out <= 0;
+					sample_aux_block_counter_out <= 0;
+					aux_counter_out <= 0;
+					debug_fifo_to_serdes_process <= '1';
+					tdm_out_data <= (others=>(others=>'0'));
 				end if;
-				state_fifo_reader <= 1;
-				audio_in_rd_en_o <= '1';
-				
-				serdes_counter_out <= 0;
-				sample_serdes_counter_out <= 0;
-				sample_aux_block_counter_out <= 0;
-				aux_counter_out <= 0;
-				debug_fifo_to_serdes_process <= '1';
-				tdm_out_data <= (others=>(others=>'0'));
 			
 			elsif (state_fifo_reader = 1) then
 				audio_in_rd_en_o <= '0';
@@ -480,22 +479,19 @@ begin
 				
 			
 			--if we are in an "inbetween" state where aux-data is still distributed over slots, let's have this intermediate wait-state
-			elsif (state_fifo_reader = 6 and wclk_sync_fetch_data_shift="10") then
-				
-		
-				debug_fifo_to_serdes_process <= '1';
-				state_fifo_reader <= 1;
-				audio_in_rd_en_o <= '1';
-				
-				serdes_counter_out <= 0;
-				sample_serdes_counter_out <= 0;		
-				
-				tdm_out_data <= (others=>(others=>'0'));
-			
-			else
+			elsif (state_fifo_reader = 6) then
+				if wclk_sync_fetch_data_shift="10" then
+					debug_fifo_to_serdes_process <= '1';
+					state_fifo_reader <= 1;
+					audio_in_rd_en_o <= '1';
+					
+					serdes_counter_out <= 0;
+					sample_serdes_counter_out <= 0;		
+					
+					tdm_out_data <= (others=>(others=>'0'));
+				end if;
 				
 			end if;
-					
 	
 		end if;
 		
