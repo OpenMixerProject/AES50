@@ -78,7 +78,7 @@ port (
 		clk_1024xfs_from_pll_i				: in  std_logic; 
 		pll_lock_n_i						: in  std_logic; 
 		clk_to_pll_o						: out std_logic;
-		pll_mult_value_o					: out natural;
+		pll_mult_value_o					: out std_logic_vector(31 downto 0);
 		pll_init_busy_i						: in  std_logic; 
 		
 		--tdm/i2s clk interface
@@ -107,21 +107,21 @@ port (
 		uart_i								: in std_logic;
 		
 		--variables
-		debug_out_signal_pulse_len_i		: in natural range 0 to 1000000;		-- 1000000@100MHz
-		first_transmit_start_counter_48k_i	: in natural range 0 to 5000000;		-- 4249500@100MHz
-		first_transmit_start_counter_44k1_i	: in natural range 0 to 5000000;		-- 4610800@100MHz	
+		debug_out_signal_pulse_len_i		: in std_logic_vector(19 downto 0);		-- 1000000@100MHz
+		first_transmit_start_counter_48k_i	: in std_logic_vector(22 downto 0);		-- 4249500@100MHz
+		first_transmit_start_counter_44k1_i	: in std_logic_vector(22 downto 0);		-- 4610800@100MHz
 		
-		wd_aes_clk_timeout_i				: in natural range 0 to 50; 			-- 50@100MHz
-		wd_aes_rx_dv_timeout_i			    : in natural range 0 to 20000;			-- 15000@100MHz	
-		mdix_timer_1ms_reference_i			: in natural range 0 to 100000;			-- 100000@100MHz
-		aes_clk_ok_counter_reference_i		: in natural range 0 to 1000000;		-- 1000000@100MHz
+		wd_aes_clk_timeout_i				: in std_logic_vector(5 downto 0); 		-- 50@100MHz
+		wd_aes_rx_dv_timeout_i			   	: in std_logic_vector(14 downto 0);		-- 15000@100MHz	
+		mdix_timer_1ms_reference_i			: in std_logic_vector(16 downto 0);		-- 100000@100MHz
+		aes_clk_ok_counter_reference_i		: in std_logic_vector(19 downto 0);		-- 1000000@100MHz
 		--Those are the multiplicators needed if we are tdm-master as well as aes-master -> we feed the PLL with a 6.25 MHz clock generated through our 100 MHz clock-domain and multiply to get 49.152 or 45.1584...
-		mult_clk625_48k_i					: in natural;								-- 8246337@100MHz
-		mult_clk625_44k1_i					: in natural;								-- 7576322@100MHz
+		mult_clk625_48k_i					: in std_logic_vector(31 downto 0);		-- 8246337@100MHz
+		mult_clk625_44k1_i					: in std_logic_vector(31 downto 0);			-- 7576322@100MHz
 		
 		--uart speed configuration
-		uart_clks_per_bit_i					: in natural;								--868 for 115.200 baud @ 100 MHz
-		uart_timeout_clks_i     			: in natural								--1000000 for 10ms @ 100 MHz
+		uart_clks_per_bit_i					: in std_logic_vector(9 downto 0);	--868 for 115.200 baud @ 100 MHz
+		uart_timeout_clks_i     			: in std_logic_vector(19 downto 0)	--1000000 for 10ms @ 100 MHz
 		);
 end aes50_top;
 
@@ -361,7 +361,7 @@ begin
 				--debug pulse generator for assm from clk
 				if (assm_active_edge = "01") then
 					assm_debug_out <= '1';
-					assm_debug_out_signal_counter <= debug_out_signal_pulse_len_i;
+					assm_debug_out_signal_counter <= to_integer(unsigned(debug_out_signal_pulse_len_i));
 				else
 					if (assm_debug_out_signal_counter > 0) then
 						assm_debug_out_signal_counter <= assm_debug_out_signal_counter - 1;
@@ -377,7 +377,7 @@ begin
 				--debug pulse generator for assm (tx-module)
 				if (assm_tx_is_active_edge = "01") then
 					assm_tx_is_active_debug_out <= '1';
-					assm_tx_is_active_debug_out_signal_counter <= debug_out_signal_pulse_len_i;
+					assm_tx_is_active_debug_out_signal_counter <= to_integer(unsigned(debug_out_signal_pulse_len_i));
 				else
 					if (assm_tx_is_active_debug_out_signal_counter > 0) then
 						assm_tx_is_active_debug_out_signal_counter <= assm_tx_is_active_debug_out_signal_counter - 1;
@@ -389,7 +389,7 @@ begin
 				--debug pulse generator for assm (rx-module)
 				if (assm_rx_is_active_edge = "01") then
 					assm_rx_is_active_debug_out <= '1';
-					assm_rx_is_active_debug_out_signal_counter <= debug_out_signal_pulse_len_i;
+					assm_rx_is_active_debug_out_signal_counter <= to_integer(unsigned(debug_out_signal_pulse_len_i));
 				else
 					if (assm_rx_is_active_debug_out_signal_counter > 0) then
 						assm_rx_is_active_debug_out_signal_counter <= assm_rx_is_active_debug_out_signal_counter - 1;
@@ -408,10 +408,10 @@ begin
 				
 					--funny magic numbers with no explanation :-)... definitely need to document this mechanism more in detail
 					if (fs_mode_i = "01") then					
-						first_transmit_start_counter <= first_transmit_start_counter_48k_i;
+						first_transmit_start_counter <= to_integer(unsigned(first_transmit_start_counter_48k_i));
 						
 					elsif (fs_mode_i = "00") then					
-						first_transmit_start_counter <= first_transmit_start_counter_44k1_i;
+						first_transmit_start_counter <= to_integer(unsigned(first_transmit_start_counter_44k1_i));
 					end if;
 					
 					first_transmit_start_counter_active <= '0';

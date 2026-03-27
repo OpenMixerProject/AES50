@@ -42,7 +42,7 @@ entity aes50_aux_decoder is
         aux_in_rd_en_o          : out std_logic;
         fifo_fill_count_aux_i   : in  natural range 0 to 176 - 1;
         
-		uart_clks_per_bit_i		: in natural;
+		uart_clks_per_bit_i		: in std_logic_vector(9 downto 0);
         uart_o					: out std_logic
 	);
 end aes50_aux_decoder;

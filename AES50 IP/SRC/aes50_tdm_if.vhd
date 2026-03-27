@@ -511,36 +511,77 @@ end process;
 process (clk100_i)
 begin
 	if rising_edge(clk100_i) then
+		-- the following option is for TDM-transmission aligned to the frame-sync
+--		case bclk_counter is
+--			when 1*32 =>
+--				shift_word_in_offset  <= 8;
+--				shift_word_out_offset <= 7;
+--				shift_store_load      <= '1';
+--			when 2*32 =>
+--				shift_word_in_offset  <= 7;
+--				shift_word_out_offset <= 6;
+--				shift_store_load      <= '1';
+--			when 3*32 =>
+--				shift_word_in_offset  <= 6;
+--				shift_word_out_offset <= 5;
+--				shift_store_load      <= '1';
+--			when 4*32 =>
+--				shift_word_in_offset  <= 5;
+--				shift_word_out_offset <= 4;
+--				shift_store_load      <= '1';
+--			when 5*32 =>
+--				shift_word_in_offset  <= 4;
+--				shift_word_out_offset <= 3;
+--				shift_store_load      <= '1';
+--			when 6*32 =>
+--				shift_word_in_offset  <= 3;
+--				shift_word_out_offset <= 2;
+--				shift_store_load      <= '1';
+--			when 7*32 =>
+--				shift_word_in_offset  <= 2;
+--				shift_word_out_offset <= 1;
+--				shift_store_load      <= '1';
+--			when 8*32 =>
+--				shift_word_in_offset  <= 1;
+--				shift_word_out_offset <= 8;
+--				shift_store_load      <= '1';
+--			when others =>
+--				shift_word_in_offset  <= 8;
+--				shift_word_out_offset <= 8;
+--				shift_store_load      <= '0';
+--		end case;
+
+		-- the following lines are for TDM-transmission with 1 bit delay to the framesync
 		case bclk_counter is
-			when 1*32 =>
+			when 1*32+1 =>
 				shift_word_in_offset  <= 8;
 				shift_word_out_offset <= 7;
 				shift_store_load      <= '1';
-			when 2*32 =>
+			when 2*32+1 =>
 				shift_word_in_offset  <= 7;
 				shift_word_out_offset <= 6;
 				shift_store_load      <= '1';
-			when 3*32 =>
+			when 3*32+1 =>
 				shift_word_in_offset  <= 6;
 				shift_word_out_offset <= 5;
 				shift_store_load      <= '1';
-			when 4*32 =>
+			when 4*32+1 =>
 				shift_word_in_offset  <= 5;
 				shift_word_out_offset <= 4;
 				shift_store_load      <= '1';
-			when 5*32 =>
+			when 5*32+1 =>
 				shift_word_in_offset  <= 4;
 				shift_word_out_offset <= 3;
 				shift_store_load      <= '1';
-			when 6*32 =>
+			when 6*32+1 =>
 				shift_word_in_offset  <= 3;
 				shift_word_out_offset <= 2;
 				shift_store_load      <= '1';
-			when 7*32 =>
+			when 7*32+1 =>
 				shift_word_in_offset  <= 2;
 				shift_word_out_offset <= 1;
 				shift_store_load      <= '1';
-			when 8*32 =>
+			when 1 =>
 				shift_word_in_offset  <= 1;
 				shift_word_out_offset <= 8;
 				shift_store_load      <= '1';

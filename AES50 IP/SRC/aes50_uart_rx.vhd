@@ -23,7 +23,7 @@ entity aes50_uart_rx is
   port (
     i_Clk       		: in  std_logic;
     i_RX_Serial 		: in  std_logic;
-	i_CLKS_PER_BIT 		: in natural;
+	i_CLKS_PER_BIT 	: in std_logic_vector(9 downto 0);
     o_RX_DV     		: out std_logic;
     o_RX_Byte   		: out std_logic_vector(7 downto 0)
     );
@@ -75,7 +75,7 @@ begin
  
           -- Check middle of start bit to make sure it's still low
           when s_RX_Start_Bit =>
-          if r_Clk_Count = (i_CLKS_PER_BIT-1)/2 then
+          if r_Clk_Count = (to_integer(unsigned(i_CLKS_PER_BIT))-1)/2 then
             if r_RX_Data = '0' then
               r_Clk_Count <= 0;  -- reset counter since we found the middle
               r_SM_Main   <= s_RX_Data_Bits;
@@ -89,7 +89,7 @@ begin
          
         -- Wait i_CLKS_PER_BIT-1 clock cycles to sample serial data
         when s_RX_Data_Bits =>
-          if r_Clk_Count < i_CLKS_PER_BIT-1 then
+          if r_Clk_Count < to_integer(unsigned(i_CLKS_PER_BIT))-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_RX_Data_Bits;
           else
@@ -109,7 +109,7 @@ begin
         -- Receive Stop bit. Stop bit = 1
         when s_RX_Stop_Bit =>
           -- Wait i_CLKS_PER_BIT-1 clock cycles for Stop bit to finish
-          if r_Clk_Count < i_CLKS_PER_BIT-1 then
+          if r_Clk_Count < to_integer(unsigned(i_CLKS_PER_BIT))-1 then
             r_Clk_Count <= r_Clk_Count + 1;
             r_SM_Main   <= s_RX_Stop_Bit;
           else
